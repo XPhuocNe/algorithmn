@@ -1,4 +1,8 @@
 #include <bits/stdc++.h>
+
+// Link problem: https://oj.vnoi.info/problem/vmpizza.
+// Time: 3:48 29/08/2024
+
 #define NAME "XPhuoc"
 
 using namespace std;
@@ -65,7 +69,7 @@ struct ConvexHullTrick
 
     bool better(Lines x, Lines y, Lines z)
     {
-        return (z.b - y.b) * (x.a - y.a) <= (y.b - x.b) * (y.a - z.a);
+        return (z.b - y.b) * (x.a - y.a) <= (y.b - x.b) * (y.a - z.a); // hệ số góc tăng, cần tìm MAX.
     }
 
     void add(Lines ln)
@@ -96,7 +100,7 @@ struct ConvexHullTrick
 
             maximize(result, max(a, b));
 
-            if (a > b)
+            if (a > b)  // bao lồi có hình cái bát, nếu tung độ tại m lớn hơn tung độ tại m + 1 thì giảm r = m - 1, ngược lại tăng l = m + 1.
                 r = m - 1;
             else l = m + 1;
         }
