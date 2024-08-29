@@ -1,4 +1,5 @@
 // Link problem: https://oj.vnoi.info/problem/vmpizza.
+// Time: __:__ 28/08/2024.
 
 #include <bits/stdc++.h>
 #define NAME "XPhuoc"
