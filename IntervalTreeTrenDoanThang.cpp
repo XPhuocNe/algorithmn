@@ -1,3 +1,5 @@
+// Link problem: https://oj.vnoi.info/problem/vmpizza.
+
 #include <bits/stdc++.h>
 #define NAME "XPhuoc"
 
