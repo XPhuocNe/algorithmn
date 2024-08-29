@@ -169,7 +169,6 @@ const long long INF = 1e16;
 
 int n;
 Pizzas pizza[N + 7];
-Lines line[N + 7];
 long long pSB[N + 7], pSC[N + 7];
 
 long long w;
