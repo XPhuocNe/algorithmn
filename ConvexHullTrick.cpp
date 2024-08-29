@@ -1,7 +1,7 @@
-#include <bits/stdc++.h>
-
 // Link problem: https://oj.vnoi.info/problem/vmpizza.
-// Time: 3:48 29/08/2024
+// Time: 3:48 29/08/2024.
+
+#include <bits/stdc++.h>
 
 #define NAME "XPhuoc"
 
