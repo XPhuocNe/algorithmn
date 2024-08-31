@@ -1,0 +1,189 @@
+// Link problem: https://oj.vnoi.info/problem/bedao_g16_b
+// Time: 9:43 31/08/2024
+
+#include <bits/stdc++.h>
+#define NAME "XPhuoc"
+
+using namespace std;
+
+#define X first
+#define Y second
+#define pb push_back
+#define Fort(i, a, b) for (int i = (a), _b = (b); i <= _b; i++)
+#define Ford(i, a, b) for (int i = (a), _b = (b); i >= _b; i--)
+
+typedef pair<int, int> pairII;
+typedef pair<int, long long> pairIL;
+
+template <typename T>
+bool maximize(T &x, T y, T None = -1)
+{
+    if (!(x < y) && x != None)
+        return 0;
+
+    x = y;
+    return 1;
+}
+
+template <typename T>
+bool minimize(T &x, T y, T None = -1)
+{
+    if (x <= y && x != None)
+        return 0;
+
+    x = y;
+    return 1;
+}
+
+/*..............................................................................................................................................*/
+
+const int N = 2e5;
+
+int n, m;
+vector<pairIL> moutain[N + 7];
+
+int timeDFS = 0, scc = 0, num[N + 7], low[N + 7];
+bool deleted[N + 7];
+stack<int> S;
+
+vector<pairIL> g[N + 7];
+int inNode[N + 7];
+long long valNode[N + 7];
+long long dp[N + 7];
+
+void DFS(int u)
+{
+    num[u] = low[u] = ++timeDFS;
+    S.push(u);
+
+  // xây dựng cây DFS
+
+    for(pairIL E : moutain[u])
+    {
+        int v = E.X;
+
+        if (deleted[v])
+            continue;
+
+        if (!num[v])
+        {
+            DFS(v);
+
+            low[u] = min(low[u], low[v]);
+        } else low[u] = min(low[u], num[v]);
+    }
+
+    if (num[u] == low[u]) // u có thứ tự thăm sớm nhất trong thành phần liên thông mạnh chứa u
+    {
+        scc++;
+
+        int v;
+
+        do
+        {
+            v = S.top();
+            S.pop();
+            deleted[v] = 1;  // xóa đỉnh v ra khỏi đồ thị
+
+            inNode[v] = scc;
+        }
+        while (v != u);
+    }
+}
+
+long long div2(long long w)
+{
+    long long res = 0;
+
+    for(; w > 0; w /= 2)
+        res += w;
+
+    return res;
+}
+
+long long calc(int u)
+{
+    if (dp[u] != -1)
+        return dp[u];
+
+    long long res = valNode[u];
+
+    for(pairIL E : g[u])
+    {
+        int v = E.X;
+        long long w = E.Y;
+
+        maximize(res, valNode[u] + calc(v) + w);
+    }
+
+    return dp[u] = res;
+}
+
+void Read()
+{
+    cin >> n >> m;
+
+    Fort(i, 1, m)
+    {
+        int u, v;
+        long long w;
+        cin >> u >> v >> w;
+
+        moutain[u].push_back({v, w});
+    }
+}
+
+void init()
+{
+    Fort(u, 1, n)
+    {
+        num[u] = low[u] = 0;
+        deleted[u] = 0;
+
+        dp[u] = -1;
+    }
+}
+
+void Solve()
+{
+    Fort(u, 1, n)
+        if (!num[u])
+            DFS(u);
+
+    Fort(u, 1, n)
+        for(pairII E : moutain[u])
+        {
+            int v = E.X;
+            long long w = E.Y;
+
+            if (inNode[u] == inNode[v])
+                valNode[inNode[u]] += div2(w);
+            else g[inNode[u]].push_back({inNode[v], w});
+        }
+
+    cout << calc(inNode[1]) << "\n";
+}
+
+int main()
+{
+    ios::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+
+    #ifndef ONLINE_JUDGE
+        freopen(NAME".INP", "r", stdin);
+        freopen(NAME".OUT", "w", stdout);
+    #endif // ONLINE_JUDGE
+
+    int TEST = 1;
+
+    if (TEST == 0)
+        cin >> TEST;
+
+    while (TEST--)
+    {
+        Read();
+        init();
+        Solve();
+    }
+
+    return 0;
+}
