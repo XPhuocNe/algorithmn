@@ -1,0 +1,203 @@
+// Link problem: https://oj.vnoi.info/problem/avlbit
+// Time: 9:35 16/09/2024.
+
+#include <bits/stdc++.h>
+#define NAME "XPhuoc"
+
+using namespace std;
+
+#define X first
+#define Y second
+#define pb push_back
+#define Fort(i, a, b) for (int i = (a), _b = (b); i <= _b; i++)
+#define Ford(i, a, b) for (int i = (a), _b = (b); i >= _b; i--)
+
+typedef pair<int, int> pairII;
+typedef pair<int, long long> pairIL;
+typedef pair<long long, int> pairLI;
+/*..............................................................................................................................................*/
+
+const int N = 1e5;
+int n;
+int a[N + 7];
+int lg[N + 7];
+int last[N + 7];
+int sub[N + 7];
+long long pS[N + 7];
+
+int q;
+
+struct RangeMinimumQuery
+{
+    static const int MAX = 1e5;
+
+    static void init()
+    {
+        lg[1] = 0;
+
+        Fort(i, 2, MAX)
+            lg[i] = lg[i / 2] + 1;
+    }
+
+    int n, LOG;
+    int *a;
+
+    int T;
+
+    int comb(int x, int y)
+    {
+        if (T == 1)
+            return min(x, y);
+
+        if (T == 2)
+            return max(x, y);
+
+        return __gcd(x, y);
+    }
+
+    vector<vector<int> > dp;
+
+    RangeMinimumQuery()
+    {
+        n = 0;
+        T = 0;
+    }
+
+    RangeMinimumQuery(int _n, int _a[], int _T): n(_n), T(_T)
+    {
+        a = _a;
+
+        LOG = lg[n];
+
+        dp.resize(n + 2, vector<int> (LOG + 2, 0));
+
+        Ford(i, n, 1)
+        {
+            dp[i][0] = a[i];
+
+            for(int x = 1; i + (1 << x) - 1 <= n; x++)
+                dp[i][x] = comb(dp[i][x - 1], dp[i + (1 << (x - 1))][x - 1]);
+
+        }
+    }
+
+    int query(int l, int r)
+    {
+        int k = lg[r - l + 1];
+
+        return comb(dp[l][k], dp[r - (1 << k) + 1][k]);
+    }
+
+};
+
+void Read()
+{
+    cin >> n >> q;
+
+    Fort(i, 1, n)
+        cin >> a[i];
+}
+
+RangeMinimumQuery maxi, mixi, las, gcd;
+
+
+void init()
+{
+    vector<pairII> vec(n + 1);
+
+    Fort(i, 1, n)
+        vec[i] = {a[i], i};
+
+    sort(vec.begin() + 1, vec.begin() + n + 1);
+
+    int i = 1;
+
+    while (i <= n)
+    {
+        last[vec[i].Y] = -1;
+
+        for(i++; vec[i].X == vec[i - 1].X && i <= n; i++)
+            last[vec[i].Y] = vec[i - 1].Y;
+    }
+
+//    Fort(i, 1, n)
+//        cout << last[i] << " ";
+
+    Fort(i, 1, n - 1)
+        sub[i] = abs(a[i] - a[i + 1]);
+
+    pS[0] = 0;
+
+    Fort(i, 1, n)
+        pS[i] = pS[i - 1] + a[i];
+}
+
+bool query(int l, int r)
+{
+    if (l == r)
+        return 0;
+
+    int xb = mixi.query(l, r);
+    int xe = maxi.query(l, r);
+
+    int maxLast = las.query(l, r);
+
+    if (l <= maxLast) // 1. check phan tu doan phan biet.
+        return 0;
+
+
+
+    if (pS[r] - pS[l - 1] != 1LL * (xb + xe) * (r - l + 1) / 2) // 2. check tong day bang tong doan
+        return 0;
+
+
+
+    if ((xe - xb) % (r - l) != 0)
+        return 0;
+
+    int d = (xe - xb) / (r - l); // 3. check day co ton tai cong sai khong
+
+    return (gcd.query(l, r - 1) % d == 0); // 4. check xem co thoa man cong sai khong
+}
+
+void Solve()
+{
+    RangeMinimumQuery::init();
+    mixi = RangeMinimumQuery(n, a, 1);
+    maxi = RangeMinimumQuery(n, a, 2);
+    las = RangeMinimumQuery(n, last, 2);
+    gcd = RangeMinimumQuery(n - 1, sub, 3);
+
+    while (q--)
+    {
+        int l, r;
+        cin >> l >> r;
+
+        if (query(l, r) == 1)
+            cout << "YES\n";
+        else cout << "NO\n";
+    }
+}
+int main()
+{
+    ios::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+
+    #ifndef ONLINE_JUDGE
+        freopen(NAME".INP", "r", stdin);
+        freopen(NAME".OUT", "w", stdout);
+    #endif // ONLINE_JUDGE
+
+    int TEST = 1;
+
+    if (TEST == 0)
+        cin >> TEST;
+
+    while (TEST--)
+    {
+        Read();
+        init();
+        Solve();
+    }
+
+    return 0;
+}
