@@ -120,9 +120,6 @@ void init()
             last[vec[i].Y] = vec[i - 1].Y;
     }
 
-//    Fort(i, 1, n)
-//        cout << last[i] << " ";
-
     Fort(i, 1, n - 1)
         sub[i] = abs(a[i] - a[i + 1]);
 
@@ -145,12 +142,8 @@ bool query(int l, int r)
     if (l <= maxLast) // 1. check phan tu doan phan biet.
         return 0;
 
-
-
     if (pS[r] - pS[l - 1] != 1LL * (xb + xe) * (r - l + 1) / 2) // 2. check tong day bang tong doan
         return 0;
-
-
 
     if ((xe - xb) % (r - l) != 0)
         return 0;
