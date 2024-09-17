@@ -64,33 +64,14 @@ void ZFunction()
     zF[1] = n;
     zF[n + 1] = 0;
 
-    int l = 1, r = 1;
-
-    Fort(i, 2, n)
-        if (r < i)
-        {
-            l = i, r = i;
-
-            while (r <= n && S[r] == S[r - l + 1])
-                r++;
-
-            zF[i] = r - l;
-            r--;
-        }
-        else
-        {
-            if (zF[i - l + 1] < r - l + 1) zF[i] = zF[i - l + 1];
-            else
-            {
-                l = i, r = i;
-
-                while (r <= n && S[r] == S[r - l + 1])
-                    r++;
-
-                zF[i] = r - l;
-                r--;
-            }
-        }
+	for (int i = 2, l = 1, r = 1; i <= n; ++i) {
+		if (i <= r)
+			zF[i] = min(r - i + 1, zF[i - l + 1]);
+		while (i + zF[i] <= n && S[zF[i] + 1] == S[i + zF[i]])
+			++zF[i];
+		if (i + zF[i] - 1 > r)
+			l = i, r = i + zF[i] - 1;
+	}
 }
 
 void Read()
