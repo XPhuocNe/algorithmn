@@ -1,0 +1,154 @@
+// Time: 9:33 28.11.2024
+
+#include <bits/stdc++.h>
+using namespace std;
+
+#define NAME "BWPOINTS"
+#define Fort(i, a, b) for(int i = (a), _b = (b); i <= _b; i++)
+#define Ford(i, a, b) for(int i = (a), _b = (b); i >= _b; i--)
+
+struct Points
+{
+    long long x, y;
+
+    Points(long long _x = 0, long long _y = 0):
+        x(_x), y(_y) {};
+
+    bool operator < (const Points &other) const
+    {
+        if (x != other.x) return x < other.x;
+
+        return y < other.y;
+    }
+
+    bool operator == (const Points &other) const
+    {
+        return (x == other.x && y == other.y);
+    }
+};
+
+int n;
+vector<Points> bk, wt;
+
+int k;
+
+void Read()
+{
+    cin >> n;
+
+    bk.resize(n + 2);
+    wt.resize(n + 2);
+
+    Fort(i, 1, n)
+        cin >> bk[i].x >> bk[i].y;
+
+    Fort(i, 1, n)
+        cin >> wt[i].x >> wt[i].y;
+}
+
+long long cross(Points &A, Points &B, Points &C)
+{
+    return (B.x - A.x) * (C.y - A.y) - (B.y - A.y) * (C.x - A.x);
+}
+
+long long dot(Points &A, Points &B, Points &C)
+{
+    return (B.x - A.x) * (C.x - A.x) + (B.y - A.y) * (C.y - A.y);
+}
+
+bool onSegment(Points &P, Points &A, Points &B)
+{
+    return (cross(A, B, P) == 0 && dot(P, A, B) <= 0);
+}
+
+bool cw(Points &A, Points &B, Points &C)
+{
+    return (cross(A, B, C) < 0);
+}
+
+bool ccw(Points &A, Points &B, Points &C)
+{
+    return (cross(A, B, C) > 0);
+}
+
+vector<Points> ConvexHull(vector<Points> &p)
+{
+    k = 0;
+    vector<Points> ch(2 * n + 5);
+    sort(p.begin() + 1, p.begin() + n + 1);
+
+    Fort(i, 1, n)
+    {
+        while (k > 1 && ccw(ch[k - 1], ch[k], p[i])) k--;
+        ch[++k] = p[i];
+    }
+
+    Ford(i, n - 1, 1)
+    {
+        while (k > 1 && ccw(ch[k - 1], ch[k], p[i])) k--;
+        ch[++k] = p[i];
+    }
+
+    if (n > 1) k--;
+
+    return ch;
+}
+
+bool onConvexHull(Points &P, vector<Points> &ch)
+{
+    if (k == 1) return (P == ch[1]);
+
+    if (k == 2) return onSegment(P, ch[1], ch[2]);
+
+    if (ccw(ch[1], ch[2], P) || cw(ch[1], ch[k], P)) return 0;
+
+    if (onSegment(P, ch[1], ch[2]) || onSegment(P, ch[1], ch[k])) return 1;
+
+    int l = 2, r = k, x = 1;
+
+    while (l <= r)
+    {
+        int m = (l + r) / 2;
+        
+        if (cross(P, ch[1], ch[m]) == 0) return onSegment(P, ch[1], ch[m]);
+        
+        if (cw(ch[1], ch[m], P)) x = m, l = m + 1;
+        else r = m - 1;
+    }
+
+    return !cw(ch[x], P, ch[x + 1]);
+}
+
+void Solve()
+{
+    vector<Points> chBlack = ConvexHull(bk);
+
+    int resWhite = 0;
+
+    Fort(i, 1, n)
+        if (onConvexHull(wt[i], chBlack)) resWhite++;
+
+    cout << resWhite << " ";
+
+    vector<Points> chWhite = ConvexHull(wt);
+
+    int resBlack = 0;
+
+    Fort(i, 1, n)
+        if (onConvexHull(bk[i], chWhite)) resBlack++;
+
+    cout << resBlack << " ";
+}
+
+int main()
+{
+    ios::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+
+    freopen(NAME".INP", "r", stdin);
+    freopen(NAME".OUT", "w", stdout);
+
+    Read();
+    Solve();
+
+    return 0;
+}
