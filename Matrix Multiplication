@@ -1,0 +1,122 @@
+// Link problem: https://www.spoj.com/problems/SEQ/
+// Code solution:
+
+#include <bits/stdc++.h>
+using namespace std;
+
+#define NAME "XPhuoc"
+
+#define Fort(i, a, b) for(int i = (a), _b = (b); i <= _b; i++)
+#define Rep(i, n) for(int i = 0; i < (n); i++)
+
+const long long MOD = 1e9;
+template <class A, class B>
+    void add(A &x, B y)
+    {
+        x += y;
+        if (x >= MOD) x -= MOD;
+    }
+
+const int L = 15;
+
+int k;
+long long n;
+long long c[L], b[L];
+
+struct Matrix
+{
+    int n, m;
+    long long d[L][L];
+
+    Matrix(int _n = 0, int _m = 0)
+    {
+        n = _n;
+        m = _m;
+
+        Rep(x, n)
+            Rep(y, m) d[x][y] = 0;
+    };
+
+    Matrix operator * (const Matrix &p) const
+    {
+        Matrix res(n, p.m);
+
+        Rep(x, n)
+            Rep(y, p.m)
+                Rep(t, m)
+                    add(res.d[x][y], d[x][t] * p.d[t][y] % MOD);
+
+        return res;
+    }
+
+    Matrix operator ^ (long long k) const
+    {
+        Matrix res(n, n);
+        Matrix p = *this;
+
+        Rep(x, n) res.d[x][x] = 1;
+
+        for(; k > 0; k >>= 1, p = p * p)
+            if (k & 1) res = res * p;
+
+        return res;
+    }
+};
+
+void Read()
+{
+    cin >> k;
+
+    Rep(i, k) cin >> b[i];
+
+    Rep(i, k) cin >> c[i];
+
+    cin >> n;
+}
+
+void Solve()
+{
+    if (n <= k)
+    {
+        cout << b[n - 1] << "\n";
+        return ;
+    }
+
+    Matrix x(1, k);
+
+    Rep(i, k)
+        x.d[0][i] = b[i];
+
+    Matrix base(k, k);
+
+    Rep(x, k)
+        Rep(y, k)
+            if (y != k - 1) base.d[x][y] = (x - 1 == y ? 1LL : 0LL);
+            else base.d[x][y] = c[k - x - 1];
+
+    Matrix res = x * (base ^ (n - k));
+
+    cout << res.d[0][k - 1] << "\n";
+}
+
+int main()
+{
+    ios::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+
+    #ifndef ONLINE_JUDGE
+        freopen(NAME".INP", "r", stdin);
+        freopen(NAME".OUT", "w", stdout);
+    #endif // ONLINE_JUDGE
+
+    int TEST = 0;
+    if (!TEST) cin >> TEST;
+
+    while (TEST--)
+    {
+        Read();
+        Solve();
+    }
+
+    return 0;
+}
+
