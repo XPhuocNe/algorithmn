@@ -5,7 +5,8 @@
 using namespace std;
 
 #define NAME "XPhuoc"
-
+#define X first
+#define Y second
 #define Fort(i, a, b) for(int i = (a), _b = (b); i <= _b; i++)
 #define Rep(i, n) for(int i = 0; i < (n); i++)
 
